@@ -626,7 +626,7 @@ async function extract(){
     const parts=[{text:'Front of business card:'},{inlineData:{mimeType:mime(imgs.front),data:b64(imgs.front)}}];
     if(imgs.back){parts.push({text:'Back of business card:'});parts.push({inlineData:{mimeType:mime(imgs.back),data:b64(imgs.back)}})}
     parts.push({text:'Extract all contact info. Return ONLY valid JSON, no markdown:\n{"name":"","phone":"","company":"","email":"","address":"","website":"","title":""}'});
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${sess.apiKey}`,
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${sess.apiKey}`,
       {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Gemini error')}
     const data=await res.json();
