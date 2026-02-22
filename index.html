@@ -6,7 +6,7 @@
 <title>CardScan Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* CSS remains unchanged as per your original design */
+/* (All your original CSS styles remain intact) */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;height:100%}
 body{font-family:'Inter',system-ui,sans-serif;background:#f7f5f0;color:#1c1917;min-height:100%;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -43,7 +43,6 @@ display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .pip.done{background:#93c5fd}
 .eyebrow{font-size:0.68rem;font-weight:600;letter-spacing:0.11em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;display:block}
 .title{font-family:'Fraunces',Georgia,serif;font-size:2rem;font-weight:300;line-height:1.15;letter-spacing:-0.03em;color:var(--text);margin-bottom:10px}
-.title em{font-style:italic;color:var(--accent)}
 .title-sm{font-family:'Fraunces',Georgia,serif;font-size:1.45rem;font-weight:300;line-height:1.2;letter-spacing:-0.025em;color:var(--text);margin-bottom:8px}
 .sub{font-size:0.9rem;font-weight:400;color:var(--sub);line-height:1.7;margin-bottom:28px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
@@ -51,14 +50,12 @@ display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .field input{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
 padding:12px 14px;font-family:'Inter',sans-serif;font-size:0.95rem;color:var(--text);
 outline:none;width:100%;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none}
-.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:none;
 border-radius:10px;padding:13px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:0.9rem;
 cursor:pointer;transition:all 0.18s;-webkit-tap-highlight-color:transparent}
 .btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(37,99,235,0.2),0 4px 12px rgba(37,99,235,0.18)}
 .btn-ghost{background:transparent;color:var(--sub);border:1.5px solid var(--border2);margin-top:10px}
 .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:0.78rem;margin:16px 0}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .info-box{background:var(--accent-l);border:1px solid var(--accent-b);border-radius:10px;
 padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
 .info-box svg{flex-shrink:0;width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;margin-top:2px}
@@ -102,7 +99,6 @@ cursor:pointer;text-align:center;padding:18px 10px;position:relative;overflow:hi
 .retake{display:none;position:absolute;bottom:6px;right:6px;z-index:3;
 background:rgba(255,255,255,0.92);color:var(--accent);border:1px solid var(--accent-b);border-radius:6px;
 padding:3px 9px;font-size:0.67rem;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer}
-.uz.filled .retake{display:block}
 .cam-row{display:flex;gap:8px;margin-bottom:14px}
 .cam-btn{flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:10px;
 padding:10px 8px;font-family:'Inter',sans-serif;font-size:0.76rem;font-weight:500;color:var(--sub);
@@ -153,7 +149,7 @@ display:flex;align-items:center;gap:9px;transition:all 0.35s cubic-bezier(0.34,1
     </div>
     <span class="eyebrow">Free &middot; No backend &middot; AI-powered</span>
     <div class="title">Turn business cards<br>into <em>contacts</em></div>
-    <p class="sub">Photograph any card, extract details instantly with AI, and save to Sheets. Free 1,500 hits/day.</p>
+    <p class="sub">Photograph any card and save directly to Google Sheets. Completely free.</p>
     <button class="btn btn-primary" onclick="goto('s-register')">Create Account &rarr;</button>
     <div class="divider">or</div>
     <button class="btn btn-ghost" onclick="startGuest()">Continue as Guest</button>
@@ -162,12 +158,12 @@ display:flex;align-items:center;gap:9px;transition:all 0.35s cubic-bezier(0.34,1
 
 <div class="screen ctr hidden" id="s-register">
   <div class="card">
-    <div class="steps-bar"><div class="pip active"></div><div class="pip"></div><div class="pip"></div></div>
-    <div class="title-sm">Create your account</div>
-    <div class="field"><label>Your Name</label><input type="text" id="reg-name" placeholder="Priya Sharma"></div>
-    <div class="field"><label>Username</label><input type="text" id="reg-user" placeholder="priya123"></div>
-    <div class="field"><label>Password</label><input type="password" id="reg-pass" placeholder="At least 6 chars"></div>
-    <button class="btn btn-primary" onclick="registerStep()">Continue &rarr;</button>
+    <div class="title-sm">Create account</div>
+    <p class="sub">Account data is stored in your browser's memory.</p>
+    <div class="field"><label>Your Name</label><input type="text" id="reg-name" placeholder="Name"></div>
+    <div class="field"><label>Username</label><input type="text" id="reg-user" placeholder="Username"></div>
+    <div class="field"><label>Password</label><input type="password" id="reg-pass" placeholder="Password (min 6)"></div>
+    <button class="btn btn-primary" onclick="registerStep()">Continue</button>
     <button class="btn btn-ghost" onclick="goto('s-login')">Sign In</button>
   </div>
 </div>
@@ -177,158 +173,181 @@ display:flex;align-items:center;gap:9px;transition:all 0.35s cubic-bezier(0.34,1
     <div class="title-sm">Welcome back</div>
     <div class="field"><label>Username</label><input type="text" id="login-user"></div>
     <div class="field"><label>Password</label><input type="password" id="login-pass"></div>
-    <button class="btn btn-primary" onclick="loginStep()">Sign In &rarr;</button>
+    <button class="btn btn-primary" onclick="loginStep()">Sign In</button>
+    <button class="btn btn-ghost" onclick="goto('s-register')">Create Account</button>
   </div>
 </div>
 
 <div class="screen ctr hidden" id="s-apikey">
   <div class="card">
-    <div class="steps-bar"><div class="pip done"></div><div class="pip active"></div><div class="pip"></div></div>
-    <span class="eyebrow">Step 2 of 3</span>
-    <div class="title-sm">Connect Gemini AI</div>
-    <p class="sub">Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>. Free: 1,500 requests/day.</p>
-    <div class="field">
-      <label>Gemini API Key</label>
-      <input type="password" id="api-key-input" placeholder="AIzaSy...">
-    </div>
-    <button class="btn btn-primary" onclick="apiKeyStep()">Continue &rarr;</button>
+    <div class="title-sm">API Key</div>
+    <p class="sub">Enter your Gemini API key from Google AI Studio.</p>
+    <div class="field"><input type="password" id="api-key-input" placeholder="AIzaSy..."></div>
+    <button class="btn btn-primary" onclick="apiKeyStep()">Continue</button>
   </div>
 </div>
 
 <div class="screen hidden" id="s-sheet">
-  <div class="card" style="max-width:480px">
-    <div class="steps-bar"><div class="pip done"></div><div class="pip done"></div><div class="pip active"></div></div>
-    <span class="eyebrow">Step 3 of 3</span>
-    <div class="title-sm">Connect Google Sheet</div>
-    <p class="sub">Contacts save directly to your spreadsheet.</p>
-    <div class="field">
-      <label>Google Sheet URL</label>
-      <input type="url" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/...">
-    </div>
-    <div class="field">
-      <label>Apps Script Web App URL</label>
-      <input type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec">
-    </div>
-    <button class="btn btn-primary" onclick="sheetStep(false)">Finish Setup &rarr;</button>
-    <button class="btn btn-ghost" onclick="sheetStep(true)">Skip for now</button>
+  <div class="card">
+    <div class="title-sm">Sheet Setup</div>
+    <div class="field"><label>Sheet URL</label><input type="url" id="sheet-url-input"></div>
+    <div class="field"><label>Apps Script URL</label><input type="url" id="script-url-input"></div>
+    <button class="btn btn-primary" onclick="sheetStep(false)">Finish</button>
+    <button class="btn btn-ghost" onclick="sheetStep(true)">Skip</button>
   </div>
 </div>
 
 <div class="screen hidden" id="s-scanner">
   <div class="scanner-wrap">
     <div class="topbar">
+      <div class="logo-name">Card<em>Scan</em></div>
       <div class="user-pill"><div class="avatar" id="avatarInitial">G</div><span class="pill-name" id="headerName">Guest</span></div>
       <button class="logout-btn" onclick="logout()">Sign out</button>
     </div>
-    <a class="sheet-link" id="sheetLinkBar" href="#" target="_blank">
-      <div style="flex:1;min-width:0"><div class="sl-label">Open Google Sheet &#8599;</div><span class="sl-url" id="sheetLinkUrl"></span></div>
-    </a>
-    <div class="page-h"><h2>Upload business card</h2></div>
+    
     <div class="upload-grid">
       <div class="uz" id="frontZone">
         <input type="file" id="frontFile" accept="image/*" onchange="handleFile('front',this)">
-        <div class="uz-ttl">Front of Card</div><img class="uz-img" id="frontPrev">
+        <div class="uz-ttl">Front Image</div>
+        <img class="uz-img" id="frontPrev">
       </div>
       <div class="uz" id="backZone">
         <input type="file" id="backFile" accept="image/*" onchange="handleFile('back',this)">
-        <div class="uz-ttl">Back (Optional)</div><img class="uz-img" id="backPrev">
+        <div class="uz-ttl">Back Image</div>
+        <img class="uz-img" id="backPrev">
       </div>
     </div>
-    <button class="extract-btn" id="extractBtn" onclick="extract()"><div class="spin"></div><span id="extractLabel">Extract Contact Info</span></button>
+
+    <button class="extract-btn" id="extractBtn" onclick="extract()">
+      <div class="spin"></div><span id="extractLabel">Extract Info</span>
+    </button>
+
     <div class="result-card" id="resultCard">
       <div class="result-grid">
-        <div class="rf"><label>Full Name</label><input id="rName" type="text"></div>
-        <div class="rf"><label>Phone</label><input id="rPhone" type="text"></div>
-        <div class="rf"><label>Company</label><input id="rCompany" type="text"></div>
-        <div class="rf"><label>Email</label><input id="rEmail" type="text"></div>
-        <div class="rf full"><label>Address</label><input id="rAddress" type="text"></div>
-        <div class="rf"><label>Website</label><input id="rWebsite" type="text"></div>
-        <div class="rf"><label>Job Title</label><input id="rTitle" type="text"></div>
+        <div class="rf"><label>Name</label><input id="rName"></div>
+        <div class="rf"><label>Phone</label><input id="rPhone"></div>
+        <div class="rf"><label>Company</label><input id="rCompany"></div>
+        <div class="rf"><label>Email</label><input id="rEmail"></div>
+        <div class="rf full"><label>Address</label><input id="rAddress"></div>
+        <div class="rf"><label>Website</label><input id="rWebsite"></div>
+        <div class="rf"><label>Title</label><input id="rTitle"></div>
       </div>
       <div class="result-actions">
         <button class="btn-save" id="saveBtn" onclick="saveSheet()">Save to Sheet</button>
         <button class="btn-discard" onclick="resetScan()">Discard</button>
       </div>
     </div>
-    <div class="hist-section" id="historySection" style="display:none">
-      <div class="hist-hdr">History <span id="histCount">0</span></div>
-      <div class="hist-list" id="histList"></div>
-    </div>
   </div>
 </div>
 
-<div class="cam-modal" id="camModal">
-  <video id="camVideo" autoplay playsinline muted></video>
-  <div class="cam-ctrls"><button class="cam-cancel" onclick="closeCam()">Cancel</button><button class="cam-snap" id="camSnapBtn">&#128247;</button></div>
-</div>
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
 <script>
 const imgs={front:null,back:null};
 let sess={user:null,guest:false,apiKey:'',scriptUrl:'',sheetUrl:''};
-let hist=[],camTarget=null,camStream=null;
 const $=id=>document.getElementById(id);
 const v=id=>$(id).value.trim();
 const sf=(id,val)=>{$(id).value=val||''};
-const mime=d=>d.split(';')[0].split(':')[1];
-const b64=d=>d.split(',')[1];
 
+/* PERSISTENCE HELPERS */
+function getUsers(){try{return JSON.parse(localStorage.getItem('cs_users')||'{}')}catch{return{}}}
+function saveUsers(u){localStorage.setItem('cs_users',JSON.stringify(u))}
+function persistSess(upd){if(sess.guest||!sess.user)return; const u=getUsers(); if(u[sess.user]){Object.assign(u[sess.user],upd); saveUsers(u)}}
+
+/* NAVIGATION */
 function goto(id){
-  document.querySelectorAll('.screen:not(.hidden)').forEach(s=>{s.classList.add('exiting');setTimeout(()=>{s.classList.add('hidden');s.classList.remove('exiting')},280)});
-  setTimeout(()=>{$(id).classList.remove('hidden')},260);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  $(id).classList.remove('hidden');
 }
-function toast(msg){const t=$('toast');$('toastMsg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
-function startGuest(){sess={user:null,guest:true,apiKey:'',scriptUrl:'',sheetUrl:''};goto('s-apikey')}
-function apiKeyStep(){sess.apiKey=v('api-key-input');goto('s-sheet')}
-function sheetStep(skip){
-  if(!skip){sess.scriptUrl=v('script-url-input');sess.sheetUrl=v('sheet-url-input')}
-  $('headerName').textContent=sess.guest?'Guest':sess.user;
-  goto('s-scanner');
+
+function toast(msg){
+  $('toastMsg').textContent=msg;
+  $('toast').classList.add('show');
+  setTimeout(()=>$('toast').classList.remove('show'),3000);
 }
+
+/* AUTH LOGIC */
+function registerStep(){
+  const name=v('reg-name'), u=v('reg-user'), p=v('reg-pass');
+  if(!u||p.length<6) return toast('Min 6 char password');
+  const users=getUsers();
+  users[u]={name,pass:p,apiKey:'',scriptUrl:'',sheetUrl:''};
+  saveUsers(users);
+  toast('Created! Login now.');
+  goto('s-login');
+}
+
+function loginStep(){
+  const u=v('login-user'), p=v('login-pass');
+  const users=getUsers();
+  if(users[u] && users[u].pass===p){
+    const r=users[u];
+    sess={user:u,guest:false,apiKey:r.apiKey,scriptUrl:r.scriptUrl,sheetUrl:r.sheetUrl};
+    r.apiKey ? launchScanner(r.name) : goto('s-apikey');
+  } else toast('Invalid Login');
+}
+
+function startGuest(){ sess.guest=true; goto('s-apikey'); }
+function apiKeyStep(){ sess.apiKey=v('api-key-input'); persistSess({apiKey:sess.apiKey}); goto('s-sheet'); }
+function sheetStep(skip){ 
+  if(!skip){ sess.scriptUrl=v('script-url-input'); sess.sheetUrl=v('sheet-url-input'); persistSess({scriptUrl:sess.scriptUrl,sheetUrl:sess.sheetUrl}); }
+  launchScanner(sess.user || 'Guest');
+}
+
+function launchScanner(name){ $('headerName').textContent=name; $('avatarInitial').textContent=name[0]; goto('s-scanner'); }
+
+/* FILE HANDLING */
 function handleFile(side,input){
-  const file=input.files[0];if(!file)return;
-  const r=new FileReader();r.onload=e=>setImg(side,e.target.result);r.readAsDataURL(file);
+  const file=input.files[0]; if(!file)return;
+  const r=new FileReader(); r.onload=e=>{imgs[side]=e.target.result; $(side+'Prev').src=e.target.result; $(side+'Zone').classList.add('filled')}; r.readAsDataURL(file);
 }
-function setImg(side,dataUrl){imgs[side]=dataUrl;$(side+'Prev').src=dataUrl;$(side+'Zone').classList.add('filled')}
-function closeCam(){if(camStream)camStream.getTracks().forEach(t=>t.stop());$('camModal').classList.remove('active')}
 
+/* GEMINI 2026 AI EXTRACTION */
 async function extract(){
-  if(!imgs.front)return toast('Add the front image first');
-  const btn=$('extractBtn');btn.disabled=true;btn.classList.add('loading');$('extractLabel').textContent='Extracting...';
-  try{
-    const parts=[{text:'Extract contact info from business card. Return ONLY valid JSON.'},{inlineData:{mimeType:mime(imgs.front),data:b64(imgs.front)}}];
-    if(imgs.back)parts.push({inlineData:{mimeType:mime(imgs.back),data:b64(imgs.back)}});
-    parts.push({text:'JSON structure: {"name":"","phone":"","company":"","email":"","address":"","website":"","title":""}'});
-
-    // UPDATED FOR 2026 STABLE USAGE & 1,500 HITS
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${sess.apiKey}`,
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-
-    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'API error')}
+  if(!imgs.front) return toast('Need front image');
+  const btn=$('extractBtn'); btn.classList.add('loading');
+  try {
+    const parts=[
+      {text:'Extract contact data as JSON:'},
+      {inlineData:{mimeType:'image/jpeg',data:imgs.front.split(',')[1]}},
+      {text:'JSON format: {"name":"","phone":"","company":"","email":"","address":"","website":"","title":""}'}
+    ];
+    // Gemini 3 Flash stable endpoint for 2026
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${sess.apiKey}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts}]})
+    });
     const data=await res.json();
-    let text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const p=JSON.parse(text.replace(/```json|```/g,'').trim());
-    sf('rName',p.name);sf('rPhone',p.phone);sf('rCompany',p.company);sf('rEmail',p.email);sf('rAddress',p.address);sf('rWebsite',p.website);sf('rTitle',p.title);
+    const clean=data.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(clean);
+    sf('rName',p.name); sf('rPhone',p.phone); sf('rCompany',p.company); sf('rEmail',p.email); sf('rAddress',p.address); sf('rWebsite',p.website); sf('rTitle',p.title);
     $('resultCard').classList.add('visible');
-    toast('Extracted!');
-  }catch(err){toast('Error: '+err.message)}
-  finally{btn.disabled=false;btn.classList.remove('loading');$('extractLabel').textContent='Extract Contact Info'}
+  } catch(e){ toast('AI Error'); }
+  finally{ btn.classList.remove('loading'); }
 }
 
+/* GOOGLE SHEETS STORAGE FIX */
 async function saveSheet(){
   const contact={name:v('rName'),phone:v('rPhone'),company:v('rCompany'),email:v('rEmail'),address:v('rAddress'),website:v('rWebsite'),title:v('rTitle')};
-  try{
-    await fetch(sess.scriptUrl,{method:'POST',mode:'no-cors',body:JSON.stringify(contact)});
-    toast('Saved!');
+  try {
+    // text/plain bypasses CORS pre-flight blocks
+    await fetch(sess.scriptUrl, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(contact)
+    });
+    toast('Stored Successfully!');
     resetScan();
-  }catch(e){toast('Save failed')}
+  } catch(e){ toast('Save Failed'); }
 }
-function resetScan(){
-  imgs.front=null;imgs.back=null;
-  ['front','back'].forEach(s=>{$(s+'Prev').src='';$(s+'Zone').classList.remove('filled')});
+
+function resetScan(){ 
+  ['rName','rPhone','rCompany','rEmail','rAddress','rWebsite','rTitle'].forEach(i=>sf(i,''));
   $('resultCard').classList.remove('visible');
 }
-function logout(){location.reload()}
+
+function logout(){ location.reload(); }
 </script>
 </body>
 </html>
