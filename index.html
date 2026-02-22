@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CardScan</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:#f7f5f0;color:#1c1917;min-height:100%;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+:root{
+  --bg:#f7f5f0;--white:#fff;--border:#e5e0d6;--border2:#cbc5b6;
+  --text:#1c1917;--sub:#6b6560;--muted:#a8a29e;
+  --accent:#2563eb;--accent-l:#eff4ff;--accent-b:#bfdbfe;
+  --green:#16a34a;--green-l:#f0fdf4;--green-b:#86efac;
+  --red:#dc2626;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(ellipse 100% 50% at 50% -5%,rgba(37,99,235,0.05) 0%,transparent 60%)}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;
+overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:24px 16px 48px;
+transition:opacity 0.3s ease,transform 0.3s ease}
+.ctr{justify-content:center}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(14px)}
+.screen.exiting{opacity:0;transform:translateY(-10px)}
+#s-sheet{justify-content:flex-start;padding-top:28px}
+#s-scanner{justify-content:flex-start;padding:0}
+
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:20px;
+padding:36px 32px;width:100%;max-width:440px;
+box-shadow:0 1px 3px rgba(0,0,0,0.04),0 8px 32px rgba(0,0,0,0.07)}
+@media(max-width:400px){.card{padding:26px 18px;border-radius:16px}}
+
+/* LOGO */
+.logo{display:flex;align-items:center;gap:9px;margin-bottom:28px}
+.logo-mark{width:30px;height:30px;border-radius:7px;background:var(--accent);
+display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.logo-name{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1rem;color:var(--text)}
+.logo-name em{color:var(--accent);font-style:normal}
+
+/* PIPS */
+.steps-bar{display:flex;gap:4px;margin-bottom:24px}
+.pip{height:2px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s}
+.pip.active{background:var(--accent)}
+.pip.done{background:#93c5fd}
+
+/* TYPOGRAPHY */
+.eyebrow{font-size:0.68rem;font-weight:600;letter-spacing:0.11em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;display:block}
+.title{font-family:'Fraunces',Georgia,serif;font-size:2rem;font-weight:300;line-height:1.15;letter-spacing:-0.03em;color:var(--text);margin-bottom:10px}
+.title em{font-style:italic;color:var(--accent)}
+.title-sm{font-family:'Fraunces',Georgia,serif;font-size:1.45rem;font-weight:300;line-height:1.2;letter-spacing:-0.025em;color:var(--text);margin-bottom:8px}
+.sub{font-size:0.9rem;font-weight:400;color:var(--sub);line-height:1.7;margin-bottom:28px}
+.sub a{color:var(--accent);text-decoration:none}
+.sub a:hover{text-decoration:underline}
+
+/* FIELDS */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
+.field label{font-size:0.7rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--sub)}
+.field input{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+padding:12px 14px;font-family:'Inter',sans-serif;font-size:0.95rem;color:var(--text);
+outline:none;width:100%;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.field input::placeholder{color:var(--muted)}
+.field .hint{font-size:0.74rem;color:var(--muted);line-height:1.5}
+.field .hint a{color:var(--accent)}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:none;
+border-radius:10px;padding:13px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:0.9rem;
+cursor:pointer;transition:all 0.18s;-webkit-tap-highlight-color:transparent}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(37,99,235,0.2),0 4px 12px rgba(37,99,235,0.18)}
+.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--sub);border:1.5px solid var(--border2);margin-top:10px}
+.btn-ghost:hover{color:var(--text);background:var(--bg)}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:0.78rem;margin:16px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* INFO BOX */
+.info-box{background:var(--accent-l);border:1px solid var(--accent-b);border-radius:10px;
+padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
+.info-box svg{flex-shrink:0;width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;margin-top:2px}
+.info-box p{font-size:0.8rem;color:#1e40af;line-height:1.65}
+.info-box p a{color:var(--accent);font-weight:500}
+.info-box strong{font-weight:600}
+
+/* COLLAPSE */
+.collapse-btn{background:none;border:none;cursor:pointer;color:var(--accent);
+font-family:'Inter',sans-serif;font-weight:600;font-size:0.82rem;
+display:flex;align-items:center;gap:7px;padding:10px 0;width:100%;text-align:left;
+border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent}
+.collapse-btn .arr{display:inline-block;transition:transform 0.25s;font-size:0.6rem;color:var(--muted)}
+.collapse-btn.open .arr{transform:rotate(90deg)}
+.collapse-body{display:none;padding:14px 0 4px}
+.collapse-body.open{display:block}
+.collapse-steps{padding-left:16px;margin-bottom:12px}
+.collapse-steps li{font-size:0.82rem;color:var(--sub);line-height:1.7;margin-bottom:4px}
+.collapse-steps li strong{color:var(--text);font-weight:600}
+.code-wrap{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:14px;
+position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px}
+.code-wrap pre{font-family:'Menlo','Courier New',monospace;font-size:0.69rem;color:#7dd3fc;line-height:1.8;white-space:pre}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(125,211,252,0.1);color:#7dd3fc;
+border:1px solid rgba(125,211,252,0.2);border-radius:6px;padding:3px 10px;
+font-size:0.65rem;font-family:'Inter',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer}
+
+/* SCANNER */
+.scanner-wrap{width:100%;max-width:540px;padding:0 16px 40px}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+padding:14px 0 18px;gap:10px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.user-pill{display:flex;align-items:center;gap:7px;background:var(--white);border:1px solid var(--border);
+border-radius:20px;padding:4px 12px 4px 5px;min-width:0;flex-shrink:1}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);flex-shrink:0;
+display:flex;align-items:center;justify-content:center;
+font-family:'Fraunces',serif;font-size:0.75rem;font-weight:600;color:#fff}
+.pill-name{font-size:0.82rem;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px}
+.logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.78rem;
+font-family:'Inter',sans-serif;padding:6px 8px;border-radius:7px;flex-shrink:0;
+transition:color 0.2s;-webkit-tap-highlight-color:transparent}
+.logout-btn:hover{color:var(--red)}
+
+.sheet-link{background:var(--green-l);border:1px solid var(--green-b);border-radius:12px;
+padding:12px 16px;text-decoration:none;margin-bottom:16px;display:none;align-items:center;gap:12px;transition:background 0.2s}
+.sheet-link.visible{display:flex}
+.sheet-link:hover{background:#dcfce7}
+.sl-label{font-size:0.65rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--green);margin-bottom:2px}
+.sl-url{font-size:0.78rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.sl-icon{stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+
+.page-h{margin-bottom:16px}
+.page-h .eyebrow{margin-bottom:3px}
+.page-h h2{font-family:'Fraunces',Georgia,serif;font-size:1.3rem;font-weight:300;letter-spacing:-0.02em;color:var(--text)}
+.page-h p{font-size:0.84rem;color:var(--sub);margin-top:3px;line-height:1.5}
+
+/* UPLOAD */
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:340px){.upload-grid{grid-template-columns:1fr}}
+.uz{background:var(--white);border:1.5px dashed var(--border2);border-radius:14px;min-height:150px;
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+cursor:pointer;text-align:center;padding:18px 10px;
+transition:border-color 0.2s,background 0.2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.uz:hover{border-color:var(--accent);background:var(--accent-l)}
+.uz.filled{border-style:solid;border-color:var(--green-b);padding:0}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-ico{width:38px;height:38px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center}
+.uz-ico svg{width:17px;height:17px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round}
+.uz-ttl{font-size:0.82rem;font-weight:600;color:var(--text)}
+.uz-hint{font-size:0.7rem;color:var(--muted)}
+.uz-badge{position:absolute;top:7px;left:7px;z-index:2;background:rgba(28,25,23,0.65);color:#fff;
+font-size:0.56rem;font-weight:700;letter-spacing:0.1em;padding:2px 6px;border-radius:4px}
+.uz-img{width:100%;height:150px;object-fit:cover;border-radius:12px;display:none}
+.uz.filled .uz-img{display:block}
+.uz.filled .uz-ico,.uz.filled .uz-ttl,.uz.filled .uz-hint{display:none}
+.retake{display:none;position:absolute;bottom:6px;right:6px;z-index:3;
+background:rgba(255,255,255,0.92);color:var(--accent);border:1px solid var(--accent-b);border-radius:6px;
+padding:3px 9px;font-size:0.67rem;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;
+-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.uz.filled .retake{display:block}
+
+.cam-row{display:flex;gap:8px;margin-bottom:14px}
+.cam-btn{flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:10px;
+padding:10px 8px;font-family:'Inter',sans-serif;font-size:0.76rem;font-weight:500;color:var(--sub);
+cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.cam-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+
+.extract-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:15px;
+font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;
+cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
+box-shadow:0 1px 2px rgba(37,99,235,0.2),0 4px 14px rgba(37,99,235,0.2);
+transition:all 0.2s;margin-bottom:14px;-webkit-tap-highlight-color:transparent}
+.extract-btn:hover{background:#1d4ed8;transform:translateY(-1px)}
+.extract-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.spin{width:15px;height:15px;flex-shrink:0;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;
+border-radius:50%;animation:spin 0.7s linear infinite;display:none}
+.extract-btn.loading .spin{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.result-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;
+display:none;margin-bottom:12px;animation:fadeUp 0.3s ease}
+.result-card.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.result-title{font-family:'Fraunces',Georgia,serif;font-size:1rem;font-weight:400;letter-spacing:-0.01em;color:var(--text)}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+@media(max-width:360px){.result-grid{grid-template-columns:1fr}}
+.rf{display:flex;flex-direction:column;gap:5px}
+.rf label{font-size:0.65rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)}
+.rf input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 11px;
+font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--text);outline:none;width:100%;
+transition:border-color 0.2s;-webkit-appearance:none}
+.rf input:focus{border-color:var(--accent)}
+.rf.full{grid-column:1/-1}
+.result-actions{display:flex;gap:8px}
+.btn-save{flex:1;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 14px;
+font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;
+display:flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent}
+.btn-save:hover{background:#1d4ed8;transform:translateY(-1px)}
+.btn-save:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.btn-discard{background:transparent;color:var(--sub);border:1px solid var(--border);border-radius:9px;
+padding:11px 14px;font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;
+transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.btn-discard:hover{border-color:var(--red);color:var(--red)}
+
+.hist-section{margin-top:20px}
+.hist-hdr{font-size:0.68rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.hist-badge{background:var(--accent-l);color:var(--accent);padding:2px 8px;border-radius:20px;font-size:0.6rem;font-weight:700}
+.hist-list{display:flex;flex-direction:column;gap:7px}
+.hist-item{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:11px 13px;
+display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;animation:fadeUp 0.3s ease}
+.h-num{font-size:0.6rem;color:var(--muted);font-weight:600}
+.h-name{font-size:0.84rem;font-weight:500;color:var(--text)}
+.h-meta{font-size:0.7rem;color:var(--sub);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.h-time{font-size:0.63rem;color:var(--muted);white-space:nowrap}
+
+.cam-modal{position:fixed;inset:0;z-index:100;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.cam-modal.active{display:flex}
+#camVideo{width:100%;max-height:65vh;border-radius:12px;object-fit:cover}
+.cam-info{color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:10px;font-family:'Inter',sans-serif;font-weight:500;text-align:center}
+.cam-ctrls{display:flex;gap:14px;margin-top:18px;align-items:center}
+.cam-snap{width:64px;height:64px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,0.15);
+cursor:pointer;font-size:1.4rem;display:flex;align-items:center;justify-content:center;
+transition:transform 0.15s;-webkit-tap-highlight-color:transparent}
+.cam-snap:active{transform:scale(0.88)}
+.cam-cancel{background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:10px;padding:13px 20px;
+font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);
+background:#1c1917;color:#fff;border:1px solid #333;padding:11px 18px;
+border-radius:10px;font-size:0.84rem;font-weight:500;
+box-shadow:0 8px 28px rgba(0,0,0,0.2);opacity:0;
+transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);z-index:200;
+display:flex;align-items:center;gap:9px;white-space:nowrap;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok .ti{color:#4ade80}
+.toast.err .ti{color:#f87171}
+.toast.info .ti{color:#fbbf24}
+
+@media(max-height:680px){.ctr{justify-content:flex-start;padding-top:16px}.logo{margin-bottom:18px}.sub{margin-bottom:18px}}
+</style>
+</head>
+<body>
+
+<!-- S1 WELCOME -->
+<div class="screen ctr" id="s-welcome">
+  <div class="card">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="12" x2="13" y2="12"/></svg></div>
+      <div class="logo-name">Card<em>Scan</em></div>
+    </div>
+    <span class="eyebrow">Free &middot; No backend &middot; AI-powered</span>
+    <div class="title">Turn business cards<br>into <em>contacts</em></div>
+    <p class="sub">Photograph any card, extract name, phone, company and address instantly with AI, and save directly to Google Sheets. Completely free.</p>
+    <button class="btn btn-primary" onclick="goto('s-register')">Create Account &rarr;</button>
+    <div class="divider">or</div>
+    <button class="btn btn-ghost" onclick="startGuest()">Continue as Guest</button>
+  </div>
+</div>
+
+<!-- S2 REGISTER -->
+<div class="screen ctr hidden" id="s-register">
+  <div class="card">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="12" x2="13" y2="12"/></svg></div>
+      <div class="logo-name">Card<em>Scan</em></div>
+    </div>
+    <div class="steps-bar"><div class="pip active"></div><div class="pip"></div><div class="pip"></div></div>
+    <div class="title-sm">Create your account</div>
+    <p class="sub">Credentials stay on this device &mdash; nothing leaves your browser.</p>
+    <div class="field"><label>Your Name</label><input type="text" id="reg-name" placeholder="e.g. Priya Sharma" autocomplete="name"></div>
+    <div class="field"><label>Username</label><input type="text" id="reg-user" placeholder="e.g. priya123" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="reg-pass" placeholder="At least 6 characters" autocomplete="new-password"></div>
+    <button class="btn btn-primary" onclick="registerStep()">Continue &rarr;</button>
+    <div class="divider">already have an account?</div>
+    <button class="btn btn-ghost" onclick="goto('s-login')">Sign In</button>
+  </div>
+</div>
+
+<!-- S3 LOGIN -->
+<div class="screen ctr hidden" id="s-login">
+  <div class="card">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="12" x2="13" y2="12"/></svg></div>
+      <div class="logo-name">Card<em>Scan</em></div>
+    </div>
+    <div class="title-sm">Welcome back</div>
+    <p class="sub">Sign in to continue where you left off.</p>
+    <div class="field"><label>Username</label><input type="text" id="login-user" placeholder="Your username" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="Your password" autocomplete="current-password"></div>
+    <button class="btn btn-primary" onclick="loginStep()">Sign In &rarr;</button>
+    <div class="divider">new here?</div>
+    <button class="btn btn-ghost" onclick="goto('s-register')">Create Account</button>
+  </div>
+</div>
+
+<!-- S4 API KEY -->
+<div class="screen ctr hidden" id="s-apikey">
+  <div class="card">
+    <div class="steps-bar"><div class="pip done"></div><div class="pip active"></div><div class="pip"></div></div>
+    <span class="eyebrow">Step 2 of 3</span>
+    <div class="title-sm">Connect Gemini AI</div>
+    <p class="sub">CardScan uses Google's free Gemini vision model to read cards. Get a key in under 1 minute &mdash; no credit card required.</p>
+    <div class="info-box">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
+      <p>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> &rarr; click <strong>Create API key</strong> &rarr; paste below. Free tier: 1,500 requests/day.</p>
+    </div>
+    <div class="field">
+      <label>Gemini API Key</label>
+      <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off">
+      <div class="hint">Stored in your browser session only. Never sent to any server.</div>
+    </div>
+    <button class="btn btn-primary" onclick="apiKeyStep()">Continue &rarr;</button>
+  </div>
+</div>
+
+<!-- S5 SHEET -->
+<div class="screen hidden" id="s-sheet">
+  <div class="card" style="max-width:480px">
+    <div class="steps-bar"><div class="pip done"></div><div class="pip done"></div><div class="pip active"></div></div>
+    <span class="eyebrow">Step 3 of 3</span>
+    <div class="title-sm">Connect Google Sheet</div>
+    <p class="sub">Contacts will be saved as rows in your sheet. Setup takes about 2 minutes.</p>
+
+    <button class="collapse-btn" onclick="toggleCollapse(this)">
+      <span class="arr">&#9654;</span> How to deploy Apps Script
+    </button>
+    <div class="collapse-body">
+      <ol class="collapse-steps">
+        <li>Open <strong>Google Sheets</strong> &rarr; Extensions &rarr; Apps Script</li>
+        <li>Delete any existing code, paste the snippet below, press <strong>Ctrl+S</strong></li>
+        <li>Click <strong>Deploy &rarr; New Deployment &rarr; Web App</strong></li>
+        <li>Set <em>Execute as</em>: <strong>Me</strong> &nbsp;&middot;&nbsp; <em>Who has access</em>: <strong>Anyone</strong></li>
+        <li>Click Deploy, authorise, then copy the <strong>Web App URL</strong></li>
+      </ol>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyGAS()">Copy</button>
+        <pre id="gas-code">function doPost(e) {
+  try {
+    var d = JSON.parse(e.postData.contents);
+    var s = SpreadsheetApp
+      .getActiveSpreadsheet()
+      .getActiveSheet();
+    if (s.getLastRow() === 0) {
+      s.appendRow(['Name','Phone','Company',
+        'Email','Address','Website',
+        'Title','Saved At']);
+      s.getRange(1,1,1,8)
+       .setFontWeight('bold');
+    }
+    s.appendRow([d.name||'',d.phone||'',
+      d.company||'',d.email||'',
+      d.address||'',d.website||'',
+      d.title||'',
+      new Date().toLocaleString()]);
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({status:'ok'}))
+      .setMimeType(
+        ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify(
+        {status:'error',msg:err.toString()}))
+      .setMimeType(
+        ContentService.MimeType.JSON);
+  }
+}
+function doGet() {
+  return ContentService.createTextOutput(
+    'CardScan endpoint active');
+}</pre>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:8px">
+      <label>Google Sheet URL</label>
+      <input type="url" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <div class="hint">Used to open your sheet later &mdash; paste the browser URL of the sheet.</div>
+    </div>
+    <div class="field">
+      <label>Apps Script Web App URL</label>
+      <input type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <button class="btn btn-primary" onclick="sheetStep(false)">Finish Setup &rarr;</button>
+    <button class="btn btn-ghost" onclick="sheetStep(true)">Skip for now</button>
+  </div>
+</div>
+
+<!-- S6 SCANNER -->
+<div class="screen hidden" id="s-scanner">
+  <div class="scanner-wrap">
+
+    <div class="topbar">
+      <div class="logo" style="margin-bottom:0">
+        <div class="logo-mark" style="width:27px;height:27px;border-radius:6px">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
+        </div>
+        <div class="logo-name" style="font-size:0.9rem">Card<em>Scan</em></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="user-pill">
+          <div class="avatar" id="avatarInitial">G</div>
+          <span class="pill-name" id="headerName">Guest</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+
+    <a class="sheet-link" id="sheetLinkBar" href="#" target="_blank">
+      <div style="flex:1;min-width:0">
+        <div class="sl-label">Open Google Sheet &#8599;</div>
+        <span class="sl-url" id="sheetLinkUrl"></span>
+      </div>
+      <svg class="sl-icon" viewBox="0 0 24 24" width="17" height="17"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </a>
+
+    <div class="page-h">
+      <span class="eyebrow">Scan card</span>
+      <h2>Upload or photograph a business card</h2>
+      <p>Add the front (required) and optionally the back for better extraction.</p>
+    </div>
+
+    <div class="upload-grid">
+      <div class="uz" id="frontZone">
+        <div class="uz-badge">FRONT</div>
+        <input type="file" id="frontFile" accept="image/*" onchange="handleFile('front',this)">
+        <div class="uz-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="12" x2="13" y2="12"/></svg></div>
+        <div class="uz-ttl">Front of Card</div>
+        <div class="uz-hint">Tap to upload</div>
+        <img class="uz-img" id="frontPrev" alt="">
+        <button class="retake" onclick="openCam('front',event)">&#128247; Retake</button>
+      </div>
+      <div class="uz" id="backZone">
+        <div class="uz-badge">BACK</div>
+        <input type="file" id="backFile" accept="image/*" onchange="handleFile('back',this)">
+        <div class="uz-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="13" y2="15"/></svg></div>
+        <div class="uz-ttl">Back <span style="opacity:0.45;font-size:0.82em">(optional)</span></div>
+        <div class="uz-hint">Tap to upload</div>
+        <img class="uz-img" id="backPrev" alt="">
+        <button class="retake" onclick="openCam('back',event)">&#128247; Retake</button>
+      </div>
+    </div>
+
+    <div class="cam-row">
+      <button class="cam-btn" onclick="openCam('front',event)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Camera &middot; Front
+      </button>
+      <button class="cam-btn" onclick="openCam('back',event)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Camera &middot; Back
+      </button>
+    </div>
+
+    <button class="extract-btn" id="extractBtn" onclick="extract()">
+      <div class="spin"></div>
+      <span id="extractLabel">Extract Contact Info</span>
+    </button>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-top">
+        <div class="result-title">Extracted Contact</div>
+        <div class="pulse-dot"></div>
+      </div>
+      <div class="result-grid">
+        <div class="rf"><label>Full Name</label><input id="rName" type="text" placeholder="&mdash;"></div>
+        <div class="rf"><label>Phone</label><input id="rPhone" type="text" placeholder="&mdash;"></div>
+        <div class="rf"><label>Company</label><input id="rCompany" type="text" placeholder="&mdash;"></div>
+        <div class="rf"><label>Email</label><input id="rEmail" type="text" placeholder="&mdash;"></div>
+        <div class="rf full"><label>Address</label><input id="rAddress" type="text" placeholder="&mdash;"></div>
+        <div class="rf"><label>Website</label><input id="rWebsite" type="text" placeholder="&mdash;"></div>
+        <div class="rf"><label>Job Title</label><input id="rTitle" type="text" placeholder="&mdash;"></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-save" id="saveBtn" onclick="saveSheet()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save to Sheet
+        </button>
+        <button class="btn-discard" onclick="resetScan()">Discard</button>
+      </div>
+    </div>
+
+    <div class="hist-section" id="historySection" style="display:none">
+      <div class="hist-hdr">Saved this session <span class="hist-badge" id="histCount">0</span></div>
+      <div class="hist-list" id="histList"></div>
+    </div>
+    <div style="height:28px"></div>
+  </div>
+</div>
+
+<!-- CAMERA -->
+<div class="cam-modal" id="camModal">
+  <video id="camVideo" autoplay playsinline muted></video>
+  <div class="cam-info" id="camInfo">Capturing front of card</div>
+  <div class="cam-ctrls">
+    <button class="cam-cancel" id="camCancelBtn">&#10005; Cancel</button>
+    <button class="cam-snap" id="camSnapBtn">&#128247;</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="ti" id="toastIcon"></span><span id="toastMsg"></span></div>
+
+<script>
+const imgs={front:null,back:null};
+let sess={user:null,guest:false,apiKey:'',scriptUrl:'',sheetUrl:''};
+let hist=[],camTarget=null,camStream=null;
+const $=id=>document.getElementById(id);
+const v=id=>$(id).value.trim();
+const gv=id=>$(id).value;
+const sf=(id,val)=>{$(id).value=val||''};
+const mime=d=>d.split(';')[0].split(':')[1];
+const b64=d=>d.split(',')[1];
+
+function goto(id){
+  document.querySelectorAll('.screen:not(.hidden)').forEach(s=>{
+    s.classList.add('exiting');
+    setTimeout(()=>{s.classList.add('hidden');s.classList.remove('exiting')},280);
+  });
+  setTimeout(()=>{const el=$(id);el.classList.remove('hidden');el.scrollTop=0},260);
+}
+function toast(msg,type='ok'){
+  const t=$('toast');
+  $('toastMsg').textContent=msg;
+  $('toastIcon').textContent=type==='ok'?'✓':type==='err'?'✕':'!';
+  t.className=`toast ${type} show`;
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);
+}
+function toggleCollapse(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+function copyGAS(){navigator.clipboard.writeText($('gas-code').textContent).then(()=>toast('Code copied!','ok'))}
+function getUsers(){try{return JSON.parse(localStorage.getItem('cs_users')||'{}')}catch{return{}}}
+function saveUsers(u){localStorage.setItem('cs_users',JSON.stringify(u))}
+function persistSess(upd){
+  if(sess.guest||!sess.user)return;
+  const u=getUsers();if(u[sess.user]){Object.assign(u[sess.user],upd);saveUsers(u)}
+}
+function registerStep(){
+  const name=v('reg-name'),user=v('reg-user'),pass=v('reg-pass');
+  if(!name)return toast('Please enter your name','err');
+  if(!user)return toast('Please choose a username','err');
+  if(pass.length<6)return toast('Password needs 6+ characters','err');
+  const users=getUsers();
+  if(users[user])return toast('Username taken — sign in instead','err');
+  users[user]={name,pass,apiKey:'',scriptUrl:'',sheetUrl:''};saveUsers(users);
+  sess={user,guest:false,apiKey:'',scriptUrl:'',sheetUrl:''};
+  toast('Account created!','ok');goto('s-apikey');
+}
+function loginStep(){
+  const user=v('login-user'),pass=v('login-pass');
+  if(!user||!pass)return toast('Please fill in all fields','err');
+  const users=getUsers();
+  if(!users[user]||users[user].pass!==pass)return toast('Incorrect username or password','err');
+  const rec=users[user];
+  sess={user,guest:false,apiKey:rec.apiKey||'',scriptUrl:rec.scriptUrl||'',sheetUrl:rec.sheetUrl||''};
+  toast(`Welcome back, ${rec.name}!`,'ok');
+  sess.apiKey?launchScanner(rec.name):goto('s-apikey');
+}
+function startGuest(){sess={user:null,guest:true,apiKey:'',scriptUrl:'',sheetUrl:''};goto('s-apikey')}
+function apiKeyStep(){
+  const key=v('api-key-input');
+  if(!key||key.length<15)return toast('Enter a valid Gemini API key','err');
+  sess.apiKey=key;persistSess({apiKey:key});goto('s-sheet');
+}
+function sheetStep(skip){
+  if(!skip){
+    const su=v('script-url-input');
+    if(!su)return toast('Enter your Apps Script URL, or tap Skip','info');
+    sess.scriptUrl=su;sess.sheetUrl=v('sheet-url-input');
+    persistSess({scriptUrl:sess.scriptUrl,sheetUrl:sess.sheetUrl});
+  }
+  const users=getUsers();
+  const name=sess.guest?'Guest':(users[sess.user]?.name||sess.user);
+  launchScanner(name);
+}
+function launchScanner(name){
+  $('headerName').textContent=name;
+  $('avatarInitial').textContent=(name||'G')[0].toUpperCase();
+  if(sess.sheetUrl){
+    $('sheetLinkBar').href=sess.sheetUrl;
+    $('sheetLinkBar').classList.add('visible');
+    $('sheetLinkUrl').textContent=sess.sheetUrl.replace(/^https?:\/\//,'');
+  }
+  goto('s-scanner');
+}
+function logout(){
+  sess={user:null,guest:false,apiKey:'',scriptUrl:'',sheetUrl:''};
+  imgs.front=null;imgs.back=null;hist=[];resetScan();
+  $('sheetLinkBar').classList.remove('visible');
+  $('historySection').style.display='none';
+  goto('s-welcome');
+}
+function handleFile(side,input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();r.onload=e=>setImg(side,e.target.result);r.readAsDataURL(file);
+}
+function setImg(side,dataUrl){
+  imgs[side]=dataUrl;$(side+'Prev').src=dataUrl;$(side+'Zone').classList.add('filled');
+}
+function openCam(side,e){
+  if(e)e.stopPropagation();camTarget=side;
+  $('camInfo').textContent=`Capturing ${side} of card`;
+  $('camModal').classList.add('active');
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})
+    .then(s=>{camStream=s;$('camVideo').srcObject=s})
+    .catch(()=>{closeCam();toast('Camera unavailable — please upload a photo','err')});
+}
+$('camSnapBtn').onclick=()=>{
+  const vid=$('camVideo');const c=document.createElement('canvas');
+  c.width=vid.videoWidth;c.height=vid.videoHeight;c.getContext('2d').drawImage(vid,0,0);
+  setImg(camTarget,c.toDataURL('image/jpeg',0.92));closeCam();
+  toast(`${camTarget.charAt(0).toUpperCase()+camTarget.slice(1)} captured`,'ok');
+};
+$('camCancelBtn').onclick=closeCam;
+function closeCam(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}$('camModal').classList.remove('active')}
+async function extract(){
+  if(!imgs.front)return toast('Please add the front of the card first','err');
+  const btn=$('extractBtn');btn.disabled=true;btn.classList.add('loading');$('extractLabel').textContent='Extracting...';
+  try{
+    const parts=[{text:'Front of business card:'},{inlineData:{mimeType:mime(imgs.front),data:b64(imgs.front)}}];
+    if(imgs.back){parts.push({text:'Back of business card:'});parts.push({inlineData:{mimeType:mime(imgs.back),data:b64(imgs.back)}})}
+    parts.push({text:'Extract all contact info. Return ONLY valid JSON, no markdown:\n{"name":"","phone":"","company":"","email":"","address":"","website":"","title":""}'});
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${sess.apiKey}`,
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Gemini error')}
+    const data=await res.json();
+    let text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    text=text.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(text);
+    sf('rName',p.name);sf('rPhone',p.phone);sf('rCompany',p.company);
+    sf('rEmail',p.email);sf('rAddress',p.address);sf('rWebsite',p.website);sf('rTitle',p.title);
+    $('resultCard').classList.add('visible');
+    $('resultCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+    toast('Contact extracted!','ok');
+  }catch(err){toast('Error: '+err.message,'err')}
+  finally{btn.disabled=false;btn.classList.remove('loading');$('extractLabel').textContent='Extract Contact Info'}
+}
+async function saveSheet(){
+  if(!sess.scriptUrl)return toast('No Script URL — go back to setup','info');
+  const sb=$('saveBtn');sb.disabled=true;sb.textContent='Saving...';
+  const contact={name:gv('rName'),phone:gv('rPhone'),company:gv('rCompany'),email:gv('rEmail'),address:gv('rAddress'),website:gv('rWebsite'),title:gv('rTitle')};
+  try{
+    await fetch(sess.scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(contact)});
+    addHist(contact);
+    if(sess.sheetUrl){$('sheetLinkBar').href=sess.sheetUrl;$('sheetLinkBar').classList.add('visible');$('sheetLinkUrl').textContent=sess.sheetUrl.replace(/^https?:\/\//,'')}
+    toast('Saved to Google Sheets ✓','ok');setTimeout(resetScan,500);
+  }catch(e){toast('Save failed: '+e.message,'err')}
+  finally{sb.disabled=false;sb.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save to Sheet'}
+}
+function addHist(c){
+  hist.unshift({...c,time:new Date()});
+  $('historySection').style.display='block';$('histCount').textContent=hist.length;
+  $('histList').innerHTML=hist.map((h,i)=>`<div class="hist-item"><div class="h-num">${String(hist.length-i).padStart(2,'0')}</div><div><div class="h-name">${h.name||'(no name)'}</div><div class="h-meta">${[h.company,h.phone].filter(Boolean).join(' · ')||h.email||'—'}</div></div><div class="h-time">${h.time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div>`).join('');
+}
+function resetScan(){
+  imgs.front=null;imgs.back=null;
+  ['front','back'].forEach(s=>{$(s+'Prev').src='';$(s+'Zone').classList.remove('filled');$(s+'File').value=''});
+  $('resultCard').classList.remove('visible');
+  ['rName','rPhone','rCompany','rEmail','rAddress','rWebsite','rTitle'].forEach(id=>$(id).value='');
+}
+['frontZone','backZone'].forEach(id=>{
+  const el=$(id),side=id.replace('Zone','');
+  el.addEventListener('dragover',e=>{e.preventDefault();el.style.borderColor='var(--accent)'});
+  el.addEventListener('dragleave',()=>el.style.borderColor='');
+  el.addEventListener('drop',e=>{e.preventDefault();el.style.borderColor='';const f=e.dataTransfer.files[0];
+    if(f?.type.startsWith('image/')){const r=new FileReader();r.onload=ev=>setImg(side,ev.target.result);r.readAsDataURL(f)}});
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT')e.target.blur()});
+</script>
+</body>
+</html>
